@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
         async jwt({token, user}) {
             if(user) {
-                token._id = user._id?.toString();
+                token.sub = user._id?.toString();
                 token.username = user.username;
             }
             return token
@@ -63,7 +63,7 @@ export const authOptions: NextAuthOptions = {
         async session({session, token}) {
             if(token){
                 session.user = session.user || {};
-                session.user._id = token._id;
+                session.user.id = token.sub;
                 session.user.username = token.username
             }
             return session;
