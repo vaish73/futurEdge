@@ -1,6 +1,6 @@
 import mongoose, {Schema, Document} from "mongoose";
 
-interface Profile extends Document{
+export interface Profile extends Document{
     userId: mongoose.Schema.Types.ObjectId;
     name: string;
     imageUrl: string;
@@ -42,8 +42,9 @@ const ProfileSchema: Schema<Profile> = new mongoose.Schema({
         {
             type: String,
             required: true
-        }
-    ]
+        },
+    ],
+
 }, {timestamps: true})
 
 const ProfileModel = mongoose.models.Profile || mongoose.model("Profile", ProfileSchema)

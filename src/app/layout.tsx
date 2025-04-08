@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import Header from '../components/header';
 import AuthProvider from '../context/AuthProvider';
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -31,6 +32,7 @@ export default function RootLayout({
             <main className="min-h-screen">
               {children}
             </main>
+            <Toaster richColors/>
             {/*footer*/}
             <footer className="bg-muted/50 py-12 ">
               <div className="container:mx-auto px-4 text-center text-gray-200">

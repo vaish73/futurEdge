@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { completeOnboarding } from "../../../../../actions/user"
+import { industries } from '../../../../../data/industries';
 
 export function OnboardingForm({ userId }: { userId: string }) {
     const router = useRouter()
@@ -13,6 +14,7 @@ export function OnboardingForm({ userId }: { userId: string }) {
         experience: 0,
         bio: ""
     });
+    
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,10 +48,12 @@ export function OnboardingForm({ userId }: { userId: string }) {
                     className="w-full p-2 border rounded"
                     required
                 >
-                    <option value="">Select your industry</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Finance">Finance</option>
-                    {/* Add more industries */}
+                    {industries.map((ind) => {
+                        return <option key={ind.id} value={ind.id}>
+                            {ind.name}
+                        </option>
+                    })}
+                    
                 </select>
             </div>
 

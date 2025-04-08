@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IIndustryInsight extends Document {
+export interface IIndustryInsight extends Document {
+  userId: mongoose.Types.ObjectId;
   industry: string;
   salaryRanges: { role: string; min: number; max: number; median: number; location?: string }[];
   growthRate: number;
@@ -9,10 +10,12 @@ interface IIndustryInsight extends Document {
   marketOutlook: "Positive" | "Neutral" | "Negative";
   keyTrends: string[];
   recommendedSkills: string[];
+  nextUpdate: Date;
 }
 
 const IndustryInsightSchema: Schema<IIndustryInsight> = new Schema(
   {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     industry: { type: String, required: true, unique: true },
     salaryRanges: [
       {
@@ -55,6 +58,10 @@ const IndustryInsightSchema: Schema<IIndustryInsight> = new Schema(
             required: true 
         }
     ],
+    nextUpdate: {
+      type: Date,
+      default: Date.now()
+    }
   },
   { timestamps: true }
 );

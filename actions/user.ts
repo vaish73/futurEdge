@@ -5,6 +5,7 @@ import dbConnect from "@/lib/dbConnect";
 import AssessmentModel from "@/models/Assessment";
 import ProfileModel from "@/models/Profile";
 import { getServerSession } from "next-auth"
+import { Profile } from '@/models/Profile'
 
 
 export async function completeOnboarding(data: {
@@ -42,7 +43,7 @@ export async function completeOnboarding(data: {
 
 export async function getUserOnboardingStatus(userId: string) {
     await dbConnect()
-    const profile = await ProfileModel.findOne({userId}).lean();
+    const profile = await ProfileModel.findOne({userId}).lean() as Profile | null;
     console.log(profile)
     return {
         isOnboarded: !!profile?.industry,
