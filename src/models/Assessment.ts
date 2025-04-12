@@ -1,19 +1,18 @@
 import mongoose, {Schema, Document} from "mongoose";
 
 interface IAssessment extends Document{
-    id: mongoose.Schema.Types.ObjectId,
+    userId: mongoose.Schema.Types.ObjectId,
     quizScore: number;
-    questions: { question: string, answer: string, userAnswer: string, isCorrect: boolean },
+    questions: { question: string, answer: string, userAnswer: string, isCorrect: boolean, explanation: string },
     category: string;
     improvementTip?: string;
 }
 
 const AssessmentSchema: Schema<IAssessment> = new mongoose.Schema({
-    id: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
-        unique: true
     },
     quizScore: {
         type: Number,
@@ -25,7 +24,8 @@ const AssessmentSchema: Schema<IAssessment> = new mongoose.Schema({
             question: String,
             answer: String,
             userAnswer: String,
-            isCorrect: Boolean
+            isCorrect: Boolean,
+            explanation:{type: String}
         }
     ],
     category: {
@@ -36,6 +36,7 @@ const AssessmentSchema: Schema<IAssessment> = new mongoose.Schema({
         type: String
     }
 },{timestamps: true})
+
 
 const AssessmentModel = mongoose.models.Assessment || mongoose.model<IAssessment>("Assessment", AssessmentSchema)
 

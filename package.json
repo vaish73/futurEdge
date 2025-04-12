@@ -28,6 +28,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
+    "inngest": "^3.34.5",
     "lucide-react": "^0.485.0",
     "mongoose": "^8.13.1",
     "next": "15.2.4",
