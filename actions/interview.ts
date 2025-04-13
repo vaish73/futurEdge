@@ -2,10 +2,10 @@
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
-import AssessmentModel from "@/models/Assessment";
 import ProfileModel, { Profile } from "@/models/Profile";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getServerSession } from "next-auth";
+import AssessmentModel from "@/models/Assessment";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -143,4 +143,64 @@ export async function saveQuizResult(questions: Question[], answers: string[], s
 
   }
 
+}
+
+type Assessment = {
+  _id: string;
+  quizScore: number;
+  category: string;
+  createdAt: string;
+  questions: {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+    answer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+    _id: string;
+  }[];
+  improvementTip: string;
+};
+
+
+export async function getAssessments(): Promise<Assessment[]> {
+  await dbConnect();
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const rawDocs = await AssessmentModel
+    .find({ userId: session.user.id })
+    .lean<{
+      questions: {
+        question: string;
+        options: string[];
+        correctAnswer: string;
+        explanation: string;
+        _id?: any;
+        answer: string;
+        userAnswer: string;
+        isCorrect: boolean;
+      }[]; _id: any; quizScore: number; category: string; createdAt: Date; improvementTip: string
+}[]>(); 
+
+  const assessments: Assessment[] = rawDocs.map((doc) => ({
+    _id: doc._id.toString(),
+    quizScore: Number(doc.quizScore),
+    category: doc.category,
+    createdAt: doc.createdAt.toISOString(),
+    questions: doc.questions.map((q) => ({
+      ...q,
+      _id: q._id?.toString?.() ?? undefined,
+      answer: q.answer,               
+      userAnswer: q.userAnswer,      
+      isCorrect: q.isCorrect,   
+    })),
+    improvementTip: doc.improvementTip
+  }));
+
+  return assessments;
 }

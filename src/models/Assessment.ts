@@ -1,6 +1,7 @@
 import mongoose, {Schema, Document} from "mongoose";
+import { InferSchemaType } from "mongoose";
 
-interface IAssessment extends Document{
+export interface IAssessment extends Document{
     userId: mongoose.Schema.Types.ObjectId,
     quizScore: number;
     questions: { question: string, answer: string, userAnswer: string, isCorrect: boolean, explanation: string },
@@ -8,7 +9,7 @@ interface IAssessment extends Document{
     improvementTip?: string;
 }
 
-const AssessmentSchema: Schema<IAssessment> = new mongoose.Schema({
+export const AssessmentSchema: Schema<IAssessment> = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -37,6 +38,10 @@ const AssessmentSchema: Schema<IAssessment> = new mongoose.Schema({
     }
 },{timestamps: true})
 
+export type AssessmentLean = InferSchemaType<typeof AssessmentSchema> & {
+    _id: string;
+    createdAt: string;
+};
 
 const AssessmentModel = mongoose.models.Assessment || mongoose.model<IAssessment>("Assessment", AssessmentSchema)
 
