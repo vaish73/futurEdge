@@ -47,13 +47,13 @@ function Header() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link href={'/resume'} className='flex items-center gap-2'>
+                      <Link href={'/ai-cover-letter'} className='flex items-center gap-2'>
                         <PenBox className='h-4 w-4' />
                         <span className='hidden md:block'>Cover Letter</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link href={'/resume'} className='flex items-center gap-2'>
+                      <Link href={'/interview'} className='flex items-center gap-2'>
                         <GraduationCapIcon className='h-4 w-4' />
                         <span className='hidden md:block'>Interview Prep</span>
                       </Link>

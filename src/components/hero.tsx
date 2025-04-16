@@ -37,15 +37,15 @@ function HeroSection() {
                     AI-Powered tools for job Success
                 </p>
             </div>
-            <div className='flex justify-center gap-2'> 
+            <div className='flex justify-center  gap-2'> 
                 <Link href="/dashboard">
                     <Button>
                         Get Started
                     </Button>
                 </Link>
-                <Link href="https://www.youtube.com/roadsidecoder">
-                    <Button size="lg" className='px-8' variant={'outline'}>
-                        Get Started
+                <Link href="https://github.com/Shikhar-Shetty">
+                    <Button className='px-5 text-center' variant={'outline'}>
+                        Git Hub
                     </Button>
                 </Link>
             </div>

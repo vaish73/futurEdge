@@ -1,14 +1,16 @@
 import mongoose, {Schema, Document} from "mongoose";
 
-interface IResume extends Document{
-    id: mongoose.Schema.Types.ObjectId;
+export interface IResume extends Document{
+    userId: mongoose.Schema.Types.ObjectId;
     content: string;
     atsScore: number;
     feedback: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const ResumeSchema: Schema<IResume> = new mongoose.Schema({
-    id: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
