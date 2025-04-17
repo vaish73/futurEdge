@@ -38,7 +38,7 @@ export async function saveResume(content: string): Promise<IResume> {
       content,
       atsScore: 0,
       feedback: "Not generated Yet",
-    }, { upsert: true, new: true, setDefaultsOnInsert:true })
+    }, { upsert: true, new: true, setDefaultsOnInsert: true })
     if (!resume) {
       throw new Error("Error creating Resume or resume not found")
     }
@@ -69,10 +69,12 @@ export async function getResume(): Promise<IResume | null> {
     throw new Error("User doesn't exist")
   }
 
-  return await ResumeModel.findOne({ userId })
+  const resume = await ResumeModel.findOne({ userId })
+  const leanResume = resume.toObject(); // converts Mongoose document to plain JS
+  return leanResume;
 }
 
-interface ImproveAIInput{
+interface ImproveAIInput {
   current: string;
   type: string;
 }
@@ -88,15 +90,15 @@ export async function improveWithAI({ current, type }: ImproveAIInput): Promise<
 
   const userId = session.user.id;
 
-  const profile = await ProfileModel.findOne({userId});
+  const profile = await ProfileModel.findOne({ userId });
 
   if (!profile) throw new Error("User doesn't exist")
 
-  if(!profile.industry){
+  if (!profile.industry) {
     revalidatePath("/onboarding");
     throw new Error("User has not chosen an industry yet")
   }
-  
+
   const prompt = `
   As an expert resume writer, improve the following ${type} description for a ${profile.industry} professional.
   Make it more impactful, quantifiable, and aligned with industry standards.
@@ -122,6 +124,70 @@ export async function improveWithAI({ current, type }: ImproveAIInput): Promise<
     console.error("AI Error:", error);
     throw new Error("Faield to improve content");
   }
+}
 
+// actions/resume.ts
+export async function generateAtsFeedback(userId: string, content: string) {
+  await dbConnect();
+  const resume = await ResumeModel.findOneAndUpdate(
+    { userId },
+    { content },
+    { upsert: true, new: true }
+  );
 
+  const prompt = `
+    You are an expert career coach and resume reviewer trained in Applicant Tracking Systems (ATS) and recruitment best practices.
+
+    Analyze the following resume content for its effectiveness in passing ATS filters and impressing recruiters.
+
+    Instructions:
+    1. Provide a JSON response only.
+    2. Your response must include:
+      - "atsScore": A score from 0 to 100 evaluating how well this resume is, to get a job with the same match.
+      - "feedback": An array of specific, actionable suggestions to improve the resume. Feedback should be concise and written in a professional tone.
+
+    Do not include any commentary or text outside the JSON object.
+
+    Resume Content:
+    """
+    ${content}
+    """
+
+    Return only this format: And give me only 3-4 critical suggestions
+    {
+      "atsScore": 0-100,
+      "feedback": [
+        "Suggestion 1",
+        "Suggestion-2",
+        ...
+      ]
+    }
+  `;
+
+  const result = await model.generateContent(prompt);
+  let rawText = result.response.text();
+
+  // 🧼 Sanitize any markdown code block wrappers
+  rawText = rawText.trim().replace(/^```(?:json)?/, "").replace(/```$/, "").trim();
+
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (err) {
+    console.error("AI failed to return valid JSON:", err, "\nRaw text was:\n", rawText);
+    throw new Error("Invalid AI response.");
+  }
+
+  // 📝 Update the resume with ATS feedback
+  const updated = await ResumeModel.findByIdAndUpdate(resume._id, {
+    atsScore: parsed.atsScore,
+    feedback: parsed.feedback,
+    content,
+  }, { new: true });
+
+  return {
+    atsScore: updated.atsScore,
+    feedback: updated.feedback,
+    resumeId: updated._id.toString(),
+  };
 }

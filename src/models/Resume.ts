@@ -4,7 +4,7 @@ export interface IResume extends Document{
     userId: mongoose.Schema.Types.ObjectId;
     content: string;
     atsScore: number;
-    feedback: string;
+    feedback: string[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -25,8 +25,8 @@ const ResumeSchema: Schema<IResume> = new mongoose.Schema({
         required: true
     },
     feedback: {
-        type: String,
-        required: true
+        type: [String],
+        default: []
     }
 }, {timestamps: true})
 

@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { saveResume } from "../../../../../actions/resume";
+import { generateAtsFeedback, saveResume } from "../../../../../actions/resume";
 import { EntryForm } from "./entry-form";
 import useFetch from "@/hooks/useFetch";
 import { entriesToMarkdown } from "@/app/lib/helper";
@@ -32,8 +32,8 @@ type ResumeFormValues = z.infer<typeof resumeSchema>;
 
 interface ResumeBuilderProps {
   initialContent: string;
-}
 
+}
 
 export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
@@ -41,6 +41,9 @@ export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
   const user = useUser();
   const [resumeMode, setResumeMode] = useState<"preview" | "edit">("preview");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [atsScore, setAtsScore] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
 
   const {
     control,
@@ -86,7 +89,7 @@ export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
         " | "
       )}\n\n</div>`
       : "";
-  }, [formValues, user]);
+  }, [formValues, user.name]);
 
   const getCombinedContent = useCallback((): string => {
     const { summary, skills, experience, education, projects } = formValues;
@@ -201,6 +204,34 @@ export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
   };
 
 
+const handleGenerateAIReview = async () => {
+  setIsGenerating(true);
+  try {
+    if (!user?.id) {
+      throw new Error("Please sign in to generate feedback");
+    }
+
+    if (!previewContent.trim()) {
+      throw new Error("Resume content is empty");
+    }
+
+    const result = await generateAtsFeedback(
+      user.id,
+      previewContent
+    );
+    
+    toast.success("ATS feedback generated!");
+    setAtsScore(result.atsScore);
+    setFeedback(result.feedback);
+    
+  } catch (err: any) {
+    toast.error(err.message || "Failed to generate feedback");
+  } finally {
+    setIsGenerating(false);
+  }
+};
+
+
   return (
     <div data-color-mode="light" className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-center gap-2">
@@ -212,6 +243,7 @@ export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
             variant="destructive"
             onClick={handleSubmit(onSubmit)}
             disabled={isSaving}
+            className="bg-red-700"
           >
             {isSaving ? (
               <>
@@ -475,7 +507,7 @@ export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
           </div>
           <div
             id="resume-pdf"
-            className="fixed top-0  left-0 w-[210mm] text-[10px] h-[370mm] bg-white p-6 scale-[1] z-[-9999] opacity-0 overflow-hidden"
+            className="fixed top-0  left-0 w-[100%] text-[10px] h-[370mm] bg-white p-6 scale-[1] z-[-9999] opacity-0 overflow-hidden"
             style={{
               position: 'fixed',
               top: '-9999px',
@@ -494,8 +526,25 @@ export default function ResumeBuilder({ initialContent }: ResumeBuilderProps) {
           </div>
         </TabsContent>
       </Tabs>
-
-
+      <div className="p-4 mt-4 rounded-xl bg-gray-100 text-gray-800 text-md shadow-md">
+        <h3 className="text-lg font-medium">📊 ATS Score: {atsScore ?? "Not generated"}</h3>
+        <h4 className="text-lg font-medium mt-2">🧠 Feedback:</h4>
+        <p className="text-gray-700 whitespace-pre-line">{feedback ?? "No feedback yet."}</p>
+      </div>
+      <Button 
+        className="bg-green-600 text-white hover:bg-green-500" 
+        onClick={handleGenerateAIReview}
+        disabled={isGenerating}
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Generating Feedback...
+          </>
+        ) : (
+          "Generate ATS Feedback"
+        )}
+      </Button>    
     </div>
   );
 }
