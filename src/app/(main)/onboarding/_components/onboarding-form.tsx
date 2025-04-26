@@ -5,11 +5,16 @@ import { useRouter } from "next/navigation"
 import { completeOnboarding } from "../../../../../actions/user"
 import { industries } from '../../../../../data/industries';
 
-export function OnboardingForm({ userId }: { userId: string }) {
+interface onBoardingFormProps{
+    userId: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function OnboardingForm({userId}:onBoardingFormProps) {
     const router = useRouter()
     const [formData, setFormData] = useState({
         name: "",
-        industry: "",
+        industry: "Technology",
         skills: [] as string[],
         experience: 0,
         bio: ""

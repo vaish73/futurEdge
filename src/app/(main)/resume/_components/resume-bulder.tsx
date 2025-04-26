@@ -243,7 +243,7 @@ const handleGenerateAIReview = async () => {
             variant="destructive"
             onClick={handleSubmit(onSubmit)}
             disabled={isSaving}
-            className="bg-red-700"
+            className="bg-green-500"
           >
             {isSaving ? (
               <>
@@ -525,26 +525,28 @@ const handleGenerateAIReview = async () => {
             />
           </div>
         </TabsContent>
-      </Tabs>
-      <div className="p-4 mt-4 rounded-xl bg-gray-100 text-gray-800 text-md shadow-md">
-        <h3 className="text-lg font-medium">📊 ATS Score: {atsScore ?? "Not generated"}</h3>
-        <h4 className="text-lg font-medium mt-2">🧠 Feedback:</h4>
-        <p className="text-gray-700 whitespace-pre-line">{feedback ?? "No feedback yet."}</p>
-      </div>
-      <Button 
-        className="bg-green-600 text-white hover:bg-green-500" 
-        onClick={handleGenerateAIReview}
-        disabled={isGenerating}
-      >
-        {isGenerating ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating Feedback...
-          </>
-        ) : (
-          "Generate ATS Feedback"
-        )}
-      </Button>    
+        </Tabs>
+        <div>
+          <div className="p-4 mt-4 my-4 rounded-xl bg-gray-100 text-gray-800 text-md shadow-md">
+            <h3 className="text-lg font-medium">📊 ATS Score: {atsScore ?? "Not generated"}</h3>
+            <h4 className="text-lg font-medium mt-2">🧠 Feedback:</h4>
+            <p className="text-gray-700 whitespace-pre-line">{feedback ?? "No feedback yet."}</p>
+          </div>
+          <Button 
+            className="bg-green-600 text-white hover:bg-green-500" 
+            onClick={handleGenerateAIReview}
+            disabled={isGenerating}
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating Feedback...
+              </>
+            ) : (
+              "Generate ATS Feedback"
+            )}
+          </Button>  
+        </div>
     </div>
   );
 }

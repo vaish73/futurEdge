@@ -16,6 +16,7 @@ function useFetch<T>(cb: (...args: any[]) => Promise<T>) {
     } catch (error: any) {
       setError(error);
       toast.error(error.message || "An error occurred");
+      throw error;
     } finally {
       setLoading(false);
     }

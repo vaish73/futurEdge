@@ -43,7 +43,15 @@ export async function saveResume(content: string): Promise<IResume> {
       throw new Error("Error creating Resume or resume not found")
     }
     revalidatePath("/resume");
-    return resume;
+
+    const plainResume = resume.toObject();
+
+    // ✨ Fix ObjectId fields
+    plainResume._id = plainResume._id.toString();
+    plainResume.userId = plainResume.userId.toString();
+
+    return plainResume;
+
   } catch (error) {
     console.error("Error saving resume:", error);
     throw new Error("Failed to save resume");
@@ -69,8 +77,11 @@ export async function getResume(): Promise<IResume | null> {
     throw new Error("User doesn't exist")
   }
 
-  const resume = await ResumeModel.findOne({ userId })
-  const leanResume = resume.toObject(); // converts Mongoose document to plain JS
+  const resume = await ResumeModel.findOne({ userId });
+
+  if(!resume) return null;
+
+  const leanResume = resume.toObject(); 
   return leanResume;
 }
 
@@ -126,7 +137,6 @@ export async function improveWithAI({ current, type }: ImproveAIInput): Promise<
   }
 }
 
-// actions/resume.ts
 export async function generateAtsFeedback(userId: string, content: string) {
   await dbConnect();
   const resume = await ResumeModel.findOneAndUpdate(
@@ -167,7 +177,6 @@ export async function generateAtsFeedback(userId: string, content: string) {
   const result = await model.generateContent(prompt);
   let rawText = result.response.text();
 
-  // 🧼 Sanitize any markdown code block wrappers
   rawText = rawText.trim().replace(/^```(?:json)?/, "").replace(/```$/, "").trim();
 
   let parsed;
@@ -178,7 +187,6 @@ export async function generateAtsFeedback(userId: string, content: string) {
     throw new Error("Invalid AI response.");
   }
 
-  // 📝 Update the resume with ATS feedback
   const updated = await ResumeModel.findByIdAndUpdate(resume._id, {
     atsScore: parsed.atsScore,
     feedback: parsed.feedback,

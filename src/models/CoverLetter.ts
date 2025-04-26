@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface ICoverLetter extends Document {
+export interface ICoverLetter extends Document {
     userId: mongoose.Schema.Types.ObjectId;
     content: string;
     jobDescription?: string;
     companyName: string;
     jobTitle: string;
-    status: string;
+    status: 'draft' | 'completed' | 'archived'; 
     createdAt: Date;
     updatedAt: Date;
 }
@@ -35,6 +35,7 @@ const CoverLetterSchema: Schema<ICoverLetter> = new Schema(
         },
         status: { 
             type: String, 
+            enum: ['draft', 'completed', 'archived'],
             default: "draft" 
         },
     },

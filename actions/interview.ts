@@ -185,7 +185,7 @@ export async function getAssessments(): Promise<Assessment[]> {
         userAnswer: string;
         isCorrect: boolean;
       }[]; _id: any; quizScore: number; category: string; createdAt: Date; improvementTip: string
-}[]>(); 
+}[]>().sort({createdAt:-1}); 
 
   const assessments: Assessment[] = rawDocs.map((doc) => ({
     _id: doc._id.toString(),

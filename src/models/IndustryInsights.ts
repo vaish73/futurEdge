@@ -16,7 +16,7 @@ export interface IIndustryInsight extends Document {
 const IndustryInsightSchema: Schema<IIndustryInsight> = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    industry: { type: String, required: true, unique: true },
+    industry: { type: String, required: true },
     salaryRanges: [
       {
         role: String,

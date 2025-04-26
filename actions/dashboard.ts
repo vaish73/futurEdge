@@ -71,6 +71,8 @@ export async function getIndustryInsights(): Promise<IndustryInsight> {
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
+  console.log(session);
+  
 
   const userId = session.user.id;
   const profile = await ProfileModel.findOne({ userId }).lean() as Profile | null;
